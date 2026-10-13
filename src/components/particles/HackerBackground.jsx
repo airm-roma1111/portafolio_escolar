@@ -4,8 +4,6 @@ export default function HackerBackground() {
   useEffect(() => {
     if (!window.particlesJS) return;
 
-    console.log(window.particlesJS);
-
     window.particlesJS("particles-js", {
       particles: {
         number: {

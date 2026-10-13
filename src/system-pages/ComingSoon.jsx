@@ -1,1 +1,11 @@
-export default function(){return <h2>Coming Soon</h2>}
+export default function ComingSoon() {
+  console.log("coming_soon");
+
+  return (
+    <main className="app-container">
+      <section className="hero">
+        <p>Proximamente...</p>
+      </section>
+    </main>
+  );
+}
