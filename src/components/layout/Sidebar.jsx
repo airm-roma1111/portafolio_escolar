@@ -43,6 +43,12 @@ export default function Sidebar() {
     if (!pinned) setExpanded(false);
   };
 
+  const handleMenuNavigation = () => {
+    if (!pinned) {
+      setExpanded(false);
+    }
+  };
+
   return (
     <>
       {/* Chincheta móvil */}
@@ -57,50 +63,60 @@ export default function Sidebar() {
         📌
       </button>
 
-      <aside
-        className={`
-            sidebar
-            ${expanded ? "expanded" : "collapsed"}
-            ${isMobile ? "mobile" : ""}
-            `}
-        onMouseEnter={!isMobile ? handleMouseEnter : undefined}
-        onMouseLeave={!isMobile ? handleMouseLeave : undefined}
-      >
+      <>
         {isMobile && expanded && (
           <div className="sidebar-overlay" onClick={() => setExpanded(false)} />
         )}
 
-        <div className="sidebar-header">
-          {expanded && (
-            <div className="sidebar-title">
-              <span>PORTAFOLIO</span>
-            </div>
-          )}
+        <aside
+          className={`
+              sidebar
+              ${expanded ? "expanded" : "collapsed"}
+              ${isMobile ? "mobile" : ""}
+            `}
+          onMouseEnter={!isMobile ? handleMouseEnter : undefined}
+          onMouseLeave={!isMobile ? handleMouseLeave : undefined}
+        >
+          {/* {isMobile && expanded && (
+            <div
+              className="sidebar-overlay"
+              onClick={() => setExpanded(false)}
+            />
+          )} */}
 
-          <button
-            className={`pin-btn ${pinned ? "active" : ""}`}
-            onClick={() => setPinned(!pinned)}
-          >
-            📌
-          </button>
-        </div>
+          <div className="sidebar-header">
+            {expanded && (
+              <div className="sidebar-title">
+                <span>PORTAFOLIO</span>
+              </div>
+            )}
 
-        <nav className="sidebar-nav">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                isActive ? "sidebar-link active" : "sidebar-link"
-              }
+            <button
+              className={`pin-btn ${pinned ? "active" : ""}`}
+              onClick={() => setPinned(!pinned)}
             >
-              <span className="sidebar-icon">{item.icon}</span>
+              📌
+            </button>
+          </div>
 
-              {expanded && <span className="sidebar-text">{item.label}</span>}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
+          <nav className="sidebar-nav">
+            {menuItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={handleMenuNavigation}
+                className={({ isActive }) =>
+                  isActive ? "sidebar-link active" : "sidebar-link"
+                }
+              >
+                <span className="sidebar-icon">{item.icon}</span>
+
+                {expanded && <span className="sidebar-text">{item.label}</span>}
+              </NavLink>
+            ))}
+          </nav>
+        </aside>
+      </>
     </>
   );
 }
