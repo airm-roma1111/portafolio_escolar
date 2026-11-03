@@ -1,11 +1,40 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { menuItems } from "./sidebarConfig";
+import { useMenuStore } from "../../services/menu/menuStore";
+
+import { menuByRole } from "../../config/menuByRole";
+
+import { logout as logoutApi } from "../../modules/auth/authService";
+import { useAuthStore } from "../../services/auth/authStore";
+
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
+  const iconMap = {
+    home: "🏠",
+    person: "👤",
+    rocket: "🚀",
+    school: "🎓",
+    mail: "✉️",
+    logout: "🚪",
+  };
+
   const [expanded, setExpanded] = useState(true);
   const [pinned, setPinned] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+
+  const role = useAuthStore((state) => state.role);
+
+  const logout = useAuthStore((state) => state.logout);
+  const token = useAuthStore((state) => state.token);
+
+  const menuStore = useMenuStore((state) => state.menus);
+  const navigate = useNavigate();
+
+  console.log("[ROLE]", role);
+  console.log("[MENU STORE]", menuStore);
+
+  const menus = role === "VISITANTE" ? menuByRole.VISITANTE : menuStore;
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,6 +77,30 @@ export default function Sidebar() {
       setExpanded(false);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      if (token) {
+        await logoutApi(token);
+      }
+    } catch (error) {
+      console.error("[LOGOUT]", error);
+    } finally {
+      logout();
+      navigate("/");
+      useMenuStore.getState().clearMenus();
+    }
+  };
+
+  if (role !== "VISITANTE" && !menus.length) {
+    return (
+      <aside className="sidebar">
+        <div className="sidebar-header">Cargando menú...</div>
+      </aside>
+    );
+  }
+
+  const showCategories = menus.length > 1;
 
   return (
     <>
@@ -100,19 +153,41 @@ export default function Sidebar() {
           </div>
 
           <nav className="sidebar-nav">
-            {menuItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={handleMenuNavigation}
-                className={({ isActive }) =>
-                  isActive ? "sidebar-link active" : "sidebar-link"
-                }
-              >
-                <span className="sidebar-icon">{item.icon}</span>
+            {menus.map((menu) => (
+              <div key={menu.id} className="sidebar-section">
+                {expanded && showCategories && (
+                  <div className="sidebar-section-title">{menu.name}</div>
+                )}
+                {menu.items.map((item) => (
+                  <NavLink
+                    key={item.id}
+                    to={item.route}
+                    onClick={handleMenuNavigation}
+                    className={({ isActive }) =>
+                      isActive ? "sidebar-link active" : "sidebar-link"
+                    }
+                  >
+                    <span className="sidebar-icon">
+                      {iconMap[item.icon] ?? "📄"}
+                    </span>
 
-                {expanded && <span className="sidebar-text">{item.label}</span>}
-              </NavLink>
+                    {expanded && (
+                      <span className="sidebar-text">{item.name}</span>
+                    )}
+                  </NavLink>
+                ))}
+
+                {role !== "VISITANTE" && (
+                  <button
+                    className="sidebar-link sidebar-logout"
+                    onClick={handleLogout}
+                  >
+                    <span className="sidebar-icon">🚪</span>
+
+                    {expanded && <span className="sidebar-text">Cerrar </span>}
+                  </button>
+                )}
+              </div>
             ))}
           </nav>
         </aside>

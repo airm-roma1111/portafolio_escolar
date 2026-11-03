@@ -5,6 +5,10 @@ import NotFound from "../system-pages/NotFound";
 import { HomePage } from "../modules/homepage";
 import ComingSoon from "../system-pages/ComingSoon";
 
+import LoginPage from "../modules/auth/pages/LoginPage";
+import RegisterPage from "../modules/auth/pages/RegisterPage";
+import SobreMiPage from "../modules/sobreMi/pages/SobreMiPage";
+
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
@@ -14,8 +18,16 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/registro",
+        element: <RegisterPage />,
+      },
+      {
         path: "/sobre-mi",
-        element: <ComingSoon />,
+        element: <SobreMiPage />,
       },
       {
         path: "/proyectos",
