@@ -28,11 +28,8 @@ export default function Sidebar() {
   const logout = useAuthStore((state) => state.logout);
   const token = useAuthStore((state) => state.token);
 
-  const menuStore = useMenuStore((state) => state.menus);
+  const menuStore = useMenuStore((state) => state.menus ?? []);
   const navigate = useNavigate();
-
-  console.log("[ROLE]", role);
-  console.log("[MENU STORE]", menuStore);
 
   const menus = role === "VISITANTE" ? menuByRole.VISITANTE : menuStore;
 
@@ -176,6 +173,8 @@ export default function Sidebar() {
                     )}
                   </NavLink>
                 ))}
+
+                {role !== "VISITANTE" && <div className="sidebar-divider" />}
 
                 {role !== "VISITANTE" && (
                   <button

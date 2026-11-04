@@ -12,8 +12,6 @@ import { getMyMenu } from "../services/menu/menuService";
 import { useMenuStore } from "../services/menu/menuStore";
 
 export default function App() {
-  console.log(import.meta.env.VITE_API_URL);
-
   const setRole = useAuthStore((state) => state.setRole);
 
   const setMenus = useMenuStore((state) => state.setMenus);
@@ -39,8 +37,8 @@ export default function App() {
           setRole("ADMINISTRATOR");
         } else if (roles.includes("COLLABORATOR")) {
           setRole("COLLABORATOR");
-        } else if (roles.includes("INVITADO")) {
-          setRole("INVITADO");
+        } else if (roles.includes("GUEST")) {
+          setRole("GUEST");
         } else {
           setRole("VISITANTE");
         }
