@@ -5,6 +5,7 @@ import NotFound from "../system-pages/NotFound";
 import { HomePage } from "../modules/homepage";
 import ComingSoon from "../system-pages/ComingSoon";
 
+import AuthCallbackPage from "../modules/auth/pages/AuthCallbackPage";
 import LoginPage from "../modules/auth/pages/LoginPage";
 import RegisterPage from "../modules/auth/pages/RegisterPage";
 import SobreMiPage from "../modules/sobreMi/pages/SobreMiPage";
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+      },
+      {
+        path: "/auth/callback",
+        element: <AuthCallbackPage />,
       },
       {
         path: "/registro",
