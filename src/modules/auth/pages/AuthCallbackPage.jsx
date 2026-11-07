@@ -1,12 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+import { getMyProfile, googleCallback } from "../authService";
+
+import { getMyMenu } from "../../../services/menu/menuService";
+
+import { useAuthStore } from "../../../services/auth/authStore";
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
 
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const processedRef = useRef(false);
+
   useEffect(() => {
+    if (processedRef.current) {
+      return;
+    }
+
+    processedRef.current = true;
     const processLogin = async () => {
       try {
         const hash = window.location.hash.substring(1);
@@ -15,34 +27,26 @@ export default function AuthCallbackPage() {
 
         const accessToken = params.get("access_token");
 
-        console.log("OAuth Hash:", window.location.hash);
-
-        console.log("Access Token:", accessToken);
-
         if (!accessToken) {
           navigate("/login");
           return;
         }
 
-        const response = await fetch(`${API_URL}/auth/google/callback`, {
-          method: "POST",
+        const auth = await googleCallback(accessToken);
 
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const profile = await getMyProfile(auth.accessToken);
+        console.log(JSON.stringify(profile, null, 2));
 
-          body: JSON.stringify({
-            accessToken,
-          }),
+        await getMyMenu(auth.accessToken);
+
+        setAuth({
+          user: profile,
+          token: auth.accessToken,
+          refreshToken: auth.refreshToken,
+          role: profile.roles?.includes("ADMINISTRATOR")
+            ? "ADMINISTRATOR"
+            : "INVITADO",
         });
-
-        if (!response.ok) {
-          throw new Error("Error callback OAuth");
-        }
-
-        const data = await response.json();
-
-        console.log("Google callback", data);
 
         navigate("/");
       } catch (error) {
@@ -53,7 +57,7 @@ export default function AuthCallbackPage() {
     };
 
     processLogin();
-  }, [navigate]);
+  }, [navigate, setAuth]);
 
-  return <div>Procesando autenticación...</div>;
+  return <div>Procesando autenticación con Google...</div>;
 }

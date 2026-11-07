@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getMyProfile, login } from "../authService";
+import { getGoogleAuthUrl, getMyProfile, login } from "../authService";
 
 import { useAuthStore } from "../../../services/auth/authStore";
 
@@ -16,6 +16,20 @@ export default function LoginPage() {
   });
 
   const [loading, setLoading] = useState(false);
+
+  async function handleGoogleLogin() {
+    console.log("handleGoogleLogin");
+    try {
+      setLoading(true);
+
+      const response = await getGoogleAuthUrl();
+
+      window.location.href = response.authUrl;
+    } catch (error) {
+      alert(error.message);
+      setLoading(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -93,6 +107,15 @@ export default function LoginPage() {
 
           <button className="login-submit-btn" disabled={loading} type="submit">
             {loading ? "Validando credenciales..." : "🔐 Ingresar"}
+          </button>
+
+          <button
+            className="login-submit-btn"
+            disabled={loading}
+            type="button"
+            onClick={handleGoogleLogin}
+          >
+            Iniciar con Google
           </button>
         </form>
 
